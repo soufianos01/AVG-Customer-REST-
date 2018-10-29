@@ -40,6 +40,7 @@ app.get('/customer', (req, res) => {
     vorname: req.query.vorname,
     nachname: req.query.nachname
   }).then((customer) => {
+    if (customer === null) res.status(404);
     res.send(customer);
   }, (e) => {
     res.status(400).send(e);
@@ -48,19 +49,17 @@ app.get('/customer', (req, res) => {
 
 //isCreditWorthy
 
-var isCreditWorthy = (c, credit) => {
-  var worthiness = c.worthiness;
-  if(credit > worthiness) {return false;}
-  return true;
-}
-
-var customer1 = {
-  vorname: 'Amy',
-  nachname: 'Jo',
-  worthiness: 10000
-};
-
-console.log(isCreditWorthy(customer1, 11000));
+app.post('/creditworthy', (req, res) => {
+  var worthiness = req.body.worthiness;
+  var credit = req.query.credit;
+  if(credit > worthiness) {
+    res.send(`Leider könnte der Kredit mit dem Wert ${credit} zu ${req.body.nachname} ${req.body.vorname} nicht erteilt`);
+  } else {
+    res.send(`Glückwunsch! der Kredit auf Höhe von ${credit} könnte zu ${req.body.nachname} ${req.body.vorname} erteilt werden`);
+  }
+}, (e) => {
+  res.status(400).send(e);
+});
 
 app.listen(3000, () => {
   console.log('Started on port 3000');
